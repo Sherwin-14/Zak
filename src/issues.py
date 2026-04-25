@@ -89,4 +89,3 @@ def format_issue_as_markdown(issue_data: dict) -> str:
 
     return "\n".join(lines)
 
-print(format_issue_as_markdown(get_all_comments('earthaccess-dev', 'earthaccess', 929)))
