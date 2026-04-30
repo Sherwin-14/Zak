@@ -89,3 +89,25 @@ def format_issue_as_markdown(issue_data: dict) -> str:
 
     return "\n".join(lines)
 
+if __name__ == "__main__":
+    # These can be hardcoded or passed via Environment Variables in your .yml
+    REPO_OWNER = os.environ.get("REPO_OWNER", "your-username")
+    REPO_NAME = os.environ.get("REPO_NAME", "your-repo")
+    ISSUE_NUM = int(os.environ.get("ISSUE_NUMBER", 1))
+    OUTPUT_FILE = "issue_thread.md"
+
+    logger.info(f"Fetching issue #{ISSUE_NUM}...")
+    
+    try:
+        data = get_all_comments(REPO_OWNER, REPO_NAME, ISSUE_NUM)
+        markdown_content = format_issue_as_markdown(data)
+        
+        # Write to file
+        with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
+            f.write(markdown_content)
+            
+        logger.info(f"Successfully saved to {OUTPUT_FILE}")
+    except Exception as e:
+        logger.error(f"Failed to process issue: {e}")
+        exit(1)
+
