@@ -1,0 +1,74 @@
+name: Test Python Script Invocation
+
+on:
+  issues:
+    types: [opened, edited]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: "Issue Number to process"
+        required: true
+        type: number
+      owner:
+        description: "GitHub Org / Owner name"
+        required: true
+        type: string
+      repo:
+        description: "Repository name"
+        required: true
+        type: string
+
+jobs:
+  invoke-zak:
+    runs-on: ubuntu-latest
+
+    permissions:
+      issues: read
+      contents: write  # needed to commit the md file back
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+
+      - name: Install uv
+        run: pip install uv
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Resolve inputs
+        id: resolve
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "issue_number=${{ inputs.issue_number }}" >> $GITHUB_OUTPUT
+            echo "owner=${{ inputs.owner }}" >> $GITHUB_OUTPUT
+            echo "repo=${{ inputs.repo }}" >> $GITHUB_OUTPUT
+          else
+            echo "issue_number=${{ github.event.issue.number }}" >> $GITHUB_OUTPUT
+            echo "owner=${{ github.repository_owner }}" >> $GITHUB_OUTPUT
+            echo "repo=${{ github.event.repository.name }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Run Zak via main.py and save output
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          mkdir -p docs/issues
+          uv run python src/main.py \
+            ${{ steps.resolve.outputs.owner }} \
+            ${{ steps.resolve.outputs.repo }} \
+            ${{ steps.resolve.outputs.issue_number }} \
+            > docs/issues/issue-${{ steps.resolve.outputs.issue_number }}.md
+
+      - name: Commit and push markdown file
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/issues/issue-${{ steps.resolve.outputs.issue_number }}.md
+          git commit -m "docs: save issue #${{ steps.resolve.outputs.issue_number }} conversation as markdown"
+          git push
