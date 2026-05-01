@@ -1,0 +1,57 @@
+{
+  "default": {
+    "sections": [
+      "Status",
+      "Date", 
+      "Deciders",
+      "Context",
+      "Considered Options",
+      "Decision",
+      "Rationale",
+      "Consequences",
+      "Open Questions",
+      "Links & References"
+    ]
+  },
+  "madr": {
+    "sections": [
+      "Status",
+      "Date",
+      "Deciders",
+      "Context and Problem Statement",
+      "Decision Drivers",
+      "Considered Options",
+      "Decision Outcome",
+      "Consequences",
+      "Pros and Cons of the Options",
+      "More Information"
+    ]
+  },
+  "nygard": {
+    "sections": [
+      "Status",
+      "Context",
+      "Decision",
+      "Consequences"
+    ]
+  },
+  "alexandrian": {
+    "sections": [
+      "Prologue",
+      "Discussion",
+      "Solution",
+      "Consequences"
+    ]
+  },
+  "rfc": {
+    "sections": [
+      "Status",
+      "Abstract",
+      "Motivation",
+      "Detailed Design",
+      "Drawbacks",
+      "Alternatives",
+      "Unresolved Questions"
+    ]
+  }
+}

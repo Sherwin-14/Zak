@@ -1,19 +1,41 @@
 import os
+import json
 from pathlib import Path
+from openai import OpenAI
 
-DEFAULT_TEMPLATE = "Use the standard Nygard format: Title, Status, Context, Decision, Consequences."
+def load_templates() -> dict:
+    templates_path = Path(__file__).parent / "prompts" / "templates.json"
+    return json.loads(templates_path.read_text(encoding="utf-8"))
 
 def build_system_prompt(adr_template: str = "default") -> str:
-    template_instruction = (
-        DEFAULT_TEMPLATE
-        if adr_template == "default"
-        else f"Use exactly this template provided by the user:\n\n{adr_template}"
+    templates = load_templates()
+    
+    if adr_template not in templates:
+        raise ValueError(f"Unknown template '{adr_template}'. Available: {list(templates.keys())}")
+    
+    sections = templates[adr_template]["sections"]
+    template_str = "\n".join(f"## {section}" for section in sections)
+    
+    prompt_path = Path(__file__).parent / "prompts" / "system_prompt.md"
+    system_prompt = prompt_path.read_text(encoding="utf-8")
+    
+    return system_prompt.format(adr_template=f"# {{title}}\n\n{template_str}")
+
+
+def generate_adr(issue_thread: str, system_prompt: str) -> str:
+    client = OpenAI(
+        base_url="https://models.inference.ai.azure.com",
+        api_key=os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"],
     )
 
-    action_root = os.environ["GITHUB_ACTION_PATH"]
-    prompt_path = Path(action_root) / "src" / "prompts" / "system_prompt.md"
+    response = client.chat.completions.create(
+        model=os.environ.get("LLM_MODEL", "gpt-4.1"),
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": issue_thread},
+        ],
+        temperature=0,
+        max_tokens=4096,
+    )
 
-    if not prompt_path.exists():
-        raise FileNotFoundError(f"System prompt not found at {prompt_path}")
-
-    return prompt_path.read_text().format(adr_template=template_instruction)
+    return response.choices[0].message.content
