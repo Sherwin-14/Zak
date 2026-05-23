@@ -35,7 +35,7 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
             {"role": "user", "content": issue_thread},
         ],
         temperature=0,
-        max_tokens=4096,
+        max_tokens=8000,
     )
 
     return response.choices[0].message.content
