@@ -33,6 +33,25 @@ def build_query(owner: str, name: str, issue_number: int, cursor: str | None) ->
           }}
         }}
     """
+def extract_issue(data: dict, owner: str, repo: str, issue_number: int) -> dict:
+    if "data" not in data or data["data"] is None:
+        msg = f"Unexpected API response: {data}"
+        raise ValueError(msg)
+    if "errors" in data:
+        msg = data['errors'][0]['message']
+        raise ValueError(f"GitHub API error: {msg}")
+    
+    repository = data["data"]["repository"]
+    if repository is None:
+        msg = f"Owner '{owner}' not found"
+        raise ValueError(msg)
+    
+    issue = repository["issue"]
+    if issue is None:
+        msg = f"Issue #{issue_number} not found in {owner}/{repo}"
+        raise ValueError(msg)
+    
+    return issue
 
 def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
     token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
@@ -54,19 +73,16 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.Timeout:
-            raise TimeoutError("GitHub API request timed out")
+            msg = "GitHub API request timed out"
+            raise TimeoutError(msg)
         except requests.exceptions.HTTPError as e:
-            raise ConnectionError(f"GitHub API HTTP error: {e}")
+            msg = f"GitHub API HTTP error: {e}"
+            raise ConnectionError(msg)
         except requests.exceptions.RequestException as e:
-            raise ConnectionError(f"Failed to reach GitHub API: {e}")
+            msg = f"Failed to reach GitHub API: {e}"
+            raise ConnectionError(msg)
 
-        if "errors" in data:
-            raise ValueError(f"GraphQL error: {data['errors']}")
-
-        issue = data["data"]["repository"]["issue"]
-        if issue is None:
-            raise ValueError(f"Issue #{issue_number} not found in {owner}/{name}")
-
+        issue = extract_issue(data, owner, name, issue_number)
         comments = issue["comments"]
         all_comments.extend(edge["node"] for edge in comments["edges"])
 
