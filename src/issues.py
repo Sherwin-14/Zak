@@ -3,9 +3,9 @@ import requests
 import logging
 from dotenv import load_dotenv
 
+load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-load_dotenv()
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 
