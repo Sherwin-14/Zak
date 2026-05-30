@@ -22,7 +22,6 @@ event, or decision in the thread. If you cannot point to it, do not write it.
 - NEVER include @username or any participant name anywhere except
   the Participants section. This applies to every section including
   Context bullets, Decision, and Consequences — no exceptions.
-- Exception: Considered Options — end each option with (proposed by @username)
 - If a section has no thread evidence → write exactly: "Not discussed"
 
 # STATUS RULES
@@ -38,17 +37,27 @@ When in doubt: If the thread contains no explicit decision signal and the issue 
 ## SECTION RULES
 
 ### Context
-Write a concise summary of the problem only — what the system lacks, what requirement or constraint triggered this decision,
-and what the consequence is of not addressing it. written for a reader who has never seen the thread and may be reading this months or years later.
+Answer only this question: "Why did this decision need to be made?"
 
-If a point is an elaboration or repetition of an earlier point, merge it. Do not pad with sentences the thread does not support.Use the thread's own language. Do not coin terms or labels that no participant used.
+Write maximum 3-5 short paragraphs covering only:
+1. The current state of the system and what it lacks
+2. The specific requirement or constraint that triggered this discussion
+3. The consequence of not addressing it
 
-Format the Context section for readability. Use short focused paragraphs — one paragraph per distinct theme or topic raised
-in the thread. Do not write one large block of prose. Do not use a single bullet dump. Do not list rejected alternatives as bullets in Context. Each paragraph should have a clear focus and flow naturally into the next.
+HARD STOP — Do not write anything else in Context.
+Do not name any technology, tool, or approach that was considered or rejected.
+Do not explain why any option was chosen or dismissed.
+Do not summarize the debate.
+Do not mention procurement, vendor, or infrastructure concerns
+unless they are the root cause of the problem itself — not a
+reason an option was rejected.
+
+If you find yourself writing a technology name that appears in
+Considered Options — delete it and stop. It does not belong here.
 
 ### Decision
 
-Write the decision in full using imperative verbs (Implement, Deprecate, Remove, Standardize, Enforce, Close, Defer, Reject). Cover everything that was explicitly decided — what was decided, what was scoped in, what was scoped out, what was explicitly ruled out, and every reason participants gave for reaching it. Write as many sentences as the thread supports. Do not pad with sentences the thread does not support. Every sentence must be traceable to a specific comment in the thread. Do not infer. Do not fill. If no decision was reached → write exactly: "Not discussed."
+State what was decided using imperative verbs (Implement, Deprecate, Remove, Standardize, Enforce, Adopt, Use).Cover only what was decided and what was explicitly scoped in. Do not mention rejected options, ruled out alternatives, or reasons why other options failed. Do not pad with sentences the thread does not support. Every sentence must be traceable to a specific comment in the thread. Do not infer. Do not fill. If no decision was reached → write exactly: "Not discussed."
 
 ### Consequences
 Write what becomes easier, harder, possible, or necessary 
@@ -62,7 +71,6 @@ Be specific to this decision — not generic.
 
 ### Considered Options (if applicable)
 List only options that were explicitly proposed or debated.
-End each with (proposed by @username).
 If no alternatives were discussed → omit this section entirely.
 
 ### Participants
