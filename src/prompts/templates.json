@@ -42,16 +42,5 @@
       "Solution",
       "Consequences"
     ]
-  },
-  "rfc": {
-    "sections": [
-      "Status",
-      "Abstract",
-      "Motivation",
-      "Detailed Design",
-      "Drawbacks",
-      "Alternatives",
-      "Unresolved Questions"
-    ]
   }
 }

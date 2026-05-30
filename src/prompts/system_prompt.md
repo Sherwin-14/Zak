@@ -38,9 +38,13 @@ When in doubt: If the thread contains no explicit decision signal and the issue 
 ## SECTION RULES
 
 ### Context
-Write a clear, thorough summary of the problem and discussion using only what was explicitly stated in the thread. Capture the essence of why the issue was raised, what was debated, and what prior art or alternatives were mentioned. Do not omit any significant point raised by any participant. Do not pad with sentences the thread does not support. Use the thread's own language. Do not coin terms or labels that no participant used.
+Write a concise summary of the problem only — what the system lacks, what requirement or constraint triggered this decision,
+and what the consequence is of not addressing it. written for a reader who has never seen the thread and may be reading this months or years later.
 
-Format the Context section for readability. Use short focused paragraphs — one paragraph per distinct theme or topic raised in the thread. Do not write one large block of prose. Do not use a single bullet dump. Each paragraph should have a clear focus and flow naturally into the next.
+If a point is an elaboration or repetition of an earlier point, merge it. Do not pad with sentences the thread does not support.Use the thread's own language. Do not coin terms or labels that no participant used.
+
+Format the Context section for readability. Use short focused paragraphs — one paragraph per distinct theme or topic raised
+in the thread. Do not write one large block of prose. Do not use a single bullet dump. Do not list rejected alternatives as bullets in Context. Each paragraph should have a clear focus and flow naturally into the next.
 
 ### Decision
 

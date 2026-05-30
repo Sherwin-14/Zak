@@ -15,7 +15,7 @@ def get_next_adr_number(owner: str, repo: str, headers: dict) -> str:
         return str(existing + 1).zfill(3)
     return "001"
 
-def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str, issue_title: str) -> str:
+def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) -> str:
     token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
     headers = {
         "Authorization": f"Bearer {token}",
@@ -36,7 +36,7 @@ def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str, 
 
     adr_number = get_next_adr_number(owner, repo, headers)
     branch_name = f"adr/issue-{issue_number}"
-    pr_title = f"ADR-{adr_number}: {issue_title}"
+    pr_title = f"ADR-{adr_number}: Issue #{issue_number}"
     file_path = f"docs/adr/ADR-{adr_number}-issue-{issue_number}.md"
 
     requests.post(
@@ -62,14 +62,14 @@ def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str, 
             "title": pr_title,
             "body": (
                 f"## 🏗️ ADR Draft\n\n"
-                f"**[Zak](https://github.com/Sherwin-14/zak)** just drafted an Architecture Decision Record "
+                f"**[Zak](https://github.com/Sherwin-14/zak)** just drafted an Architectural Decision Record "
                 f"from the discussion in Issue #{issue_number}. Your decision is documented, structured, and ready for review.\n\n"
                 f"---\n\n"
                 f"### Before you merge\n"
                 f"> ⚠️ **AI-generated content — human review required before merging.**\n\n"
-                f"- [ ] Read through the entire ADR carefully\n"
-                f"- [ ] Verify the AI has not misrepresented any decisions or participants\n"
-                f"- [ ] Correct any inaccuracies before this becomes part of your documentation\n\n"
+                f"- [ ] Read through the entire ADR carefully.\n"
+                f"- [ ] Verify the AI has not misrepresented any decisions or participants.\n"
+                f"- [ ] Correct any inaccuracies before this becomes part of your documentation.\n\n"
                 f"---\n\n"
                 f"*AI can make mistakes. You make the call.* 🚀"
             ),

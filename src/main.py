@@ -26,7 +26,7 @@ def main():
     # print("="*60 + "\n")
     # print(adr)
 
-    pr_url = create_draft_pr(owner, repo, issue_number, adr, issue_data["title"])
+    pr_url = create_draft_pr(owner, repo, issue_number, adr)
     logger.info(f"Draft PR created: {pr_url}")
 
 if __name__ == "__main__":
