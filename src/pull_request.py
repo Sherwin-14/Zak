@@ -1,9 +1,45 @@
 import os
+import json
 import base64
 import requests
 import logging
 
+from pathlib import Path
+
 logger = logging.getLogger(__name__)
+
+
+def get_auth_headers() -> dict:
+    """Build authenticated request headers using the GitHub personal access token.
+
+    Returns:
+        dict: Headers containing the Bearer token and GitHub API accept type.
+
+    Raises:
+        EnvironmentError: If GITHUB_PERSONAL_ACCESS_TOKEN is not set.
+    """
+    token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
+    if not token:
+        raise EnvironmentError(
+            "GITHUB_PERSONAL_ACCESS_TOKEN is not set. "
+            "Add it as a repo secret named GITHUB_PERSONAL_ACCESS_TOKEN."
+        )
+    return {"Authorization": f"Bearer {token}", "Accept": "application/vnd.github+json"}
+
+
+def load_pr_body(issue_number: int) -> str:
+    """Load and format the PR body template from pr_body.json.
+
+    Args:
+        issue_number: The issue number to inject into the template.
+
+    Returns:
+        str: The formatted PR body string.
+    """
+    pr_body_path = Path(__file__).parent / "prompts" / "pr_body.json"
+    template = json.loads(pr_body_path.read_text(encoding="utf-8"))
+    body = "\n".join(template["pr_body"])
+    return body.replace("{issue_number}", str(issue_number))
 
 
 def get_next_adr_number(owner: str, repo: str, headers: dict) -> str:
@@ -49,8 +85,8 @@ def resolve_base_repo(
         tuple: A three-tuple of (base_owner, base_repo, base_branch)
             pointing to the repository the PR should target.
     """
-    upstream = repo_data.get("parent")
-    if upstream:
+    if repo_data.get("fork") and repo_data.get("parent"):
+        upstream = repo_data["parent"]
         base_owner = upstream["owner"]["login"]
         base_repo = upstream["name"]
         base_branch = upstream["default_branch"]
@@ -158,19 +194,7 @@ def open_draft_pr(
         headers=headers,
         json={
             "title": f"ADR-{adr_number}: Issue #{issue_number}",
-            "body": (
-                f"## 🏗️ ADR Draft\n\n"
-                f"**[Zak](https://github.com/Sherwin-14/zak)** just drafted an Architecture Decision Record "
-                f"from the discussion in Issue #{issue_number}. Your decision is documented, structured, and ready for review.\n\n"
-                f"---\n\n"
-                f"### Before you merge\n"
-                f"> ⚠️ **AI-generated content — human review required before merging.**\n\n"
-                f"- [ ] Read through the entire ADR carefully.\n"
-                f"- [ ] Verify the AI has not misrepresented any decisions or participants.\n"
-                f"- [ ] Correct any inaccuracies before this becomes part of your documentation.\n\n"
-                f"---\n\n"
-                f"*AI can make mistakes. You make the call.* 🚀"
-            ),
+            "body": load_pr_body(issue_number),
             "head": f"{owner}:{branch_name}",
             "base": base_branch,
             "draft": True,
@@ -185,7 +209,7 @@ def open_draft_pr(
     return pr_data["html_url"]
 
 
-def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) -> str:
+def run_adr_pipeline(owner: str, repo: str, issue_number: int, adr_content: str) -> str:
     """Orchestrate branch creation, file commit, and draft PR opening.
 
     Args:
@@ -200,11 +224,7 @@ def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) 
     Raises:
         ValueError: If any step of the pipeline fails.
     """
-    token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-    }
+    headers = get_auth_headers()
 
     repo_response = requests.get(
         f"https://api.github.com/repos/{owner}/{repo}", headers=headers
