@@ -31,56 +31,85 @@ def get_next_adr_number(owner: str, repo: str, headers: dict) -> str:
     return "001"
 
 
-def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) -> str:
-    """Create a draft pull request containing a generated ADR document.
+def resolve_base_repo(
+    repo_data: dict, owner: str, repo: str, default_branch: str
+) -> tuple[str, str, str]:
+    """Resolve the base repository for pull request creation.
 
-    Creates a new branch, commits the ADR markdown file to docs/adr/,
-    and opens a draft pull request against the default branch. The PR
-    body includes a human review checklist and attribution to Zak.
+    If the repository is a fork, returns the upstream parent repository
+    details. Otherwise returns the same repository details.
 
     Args:
-        owner: The GitHub organization or user that owns the repository.
+        repo_data: The repository metadata as returned by the GitHub REST API.
+        owner: The GitHub organization or user that owns the fork.
         repo: The repository name.
-        issue_number: The issue number the ADR was generated from.
-            Used to name the branch, file, and PR title.
-        adr_content: The generated ADR document as a markdown string.
+        default_branch: The default branch of the fork.
 
     Returns:
-        str: The HTML URL of the created draft pull request.
+        tuple: A three-tuple of (base_owner, base_repo, base_branch)
+            pointing to the repository the PR should target.
+    """
+    upstream = repo_data.get("parent")
+    if upstream:
+        base_owner = upstream["owner"]["login"]
+        base_repo = upstream["name"]
+        base_branch = upstream["default_branch"]
+        logger.info(
+            f"Fork detected — PR will target upstream: {base_owner}/{base_repo}"
+        )
+    else:
+        base_owner = owner
+        base_repo = repo
+        base_branch = default_branch
+        logger.info("Not a fork — PR will target same repository")
+
+    return base_owner, base_repo, base_branch
+
+
+def push_adr_to_branch(
+    owner: str,
+    repo: str,
+    issue_number: int,
+    adr_content: str,
+    adr_number: str,
+    headers: dict,
+) -> str:
+    """Create a branch and commit the ADR file to the fork.
+
+    Args:
+        owner: The GitHub organization or user that owns the fork.
+        repo: The repository name.
+        issue_number: The issue number the ADR was generated from.
+        adr_content: The generated ADR document as a markdown string.
+        adr_number: The zero-padded ADR number (e.g. "001").
+        headers: Authenticated request headers containing the GitHub Bearer token.
+
+    Returns:
+        str: The branch name the ADR was committed to.
 
     Raises:
-        ValueError: If the PR creation response is empty or does not
-            contain an html_url, indicating the PR creation failed.
+        ValueError: If branch creation or file commit fails.
     """
-    token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github+json",
-    }
-
-    repo_response = requests.get(
-        f"https://api.github.com/repos/{owner}/{repo}", headers=headers
-    )
-    default_branch = repo_response.json()["default_branch"]
-
     branch_response = requests.get(
-        f"https://api.github.com/repos/{owner}/{repo}/git/ref/heads/{default_branch}",
+        f"https://api.github.com/repos/{owner}/{repo}/git/ref/heads/main",
         headers=headers,
     )
     sha = branch_response.json()["object"]["sha"]
 
-    adr_number = get_next_adr_number(owner, repo, headers)
     branch_name = f"adr/issue-{issue_number}"
-    pr_title = f"ADR-{adr_number}: Issue #{issue_number}"
-    file_path = f"docs/adr/ADR-{adr_number}-issue-{issue_number}.md"
+    file_path = f"docs/adr/ADR-{adr_number}.md"
 
-    requests.post(
+    branch_create_response = requests.post(
         f"https://api.github.com/repos/{owner}/{repo}/git/refs",
         headers=headers,
         json={"ref": f"refs/heads/{branch_name}", "sha": sha},
     )
+    if branch_create_response.status_code not in (201, 422):
+        raise ValueError(f"Branch creation failed: {branch_create_response.json()}")
+    if branch_create_response.status_code == 422:
+        logger.warning(f"Branch {branch_name} already exists, reusing it")
 
-    requests.put(
+    file_response = requests.put(
         f"https://api.github.com/repos/{owner}/{repo}/contents/{file_path}",
         headers=headers,
         json={
@@ -89,15 +118,49 @@ def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) 
             "branch": branch_name,
         },
     )
+    logger.info(f"File creation: {file_response.status_code}")
 
+    return branch_name
+
+
+def open_draft_pr(
+    owner: str,
+    repo: str,
+    base_owner: str,
+    base_repo: str,
+    base_branch: str,
+    branch_name: str,
+    issue_number: int,
+    adr_number: str,
+    headers: dict,
+) -> str:
+    """Open a draft pull request against the base repository.
+
+    Args:
+        owner: The GitHub organization or user that owns the fork.
+        repo: The repository name of the fork.
+        base_owner: The upstream repository owner.
+        base_repo: The upstream repository name.
+        base_branch: The upstream branch to target.
+        branch_name: The branch containing the ADR commit.
+        issue_number: The issue number the ADR was generated from.
+        adr_number: The zero-padded ADR number (e.g. "001").
+        headers: Authenticated request headers.
+
+    Returns:
+        str: The HTML URL of the created draft pull request.
+
+    Raises:
+        ValueError: If PR creation fails.
+    """
     pr_response = requests.post(
-        f"https://api.github.com/repos/{owner}/{repo}/pulls",
+        f"https://api.github.com/repos/{base_owner}/{base_repo}/pulls",
         headers=headers,
         json={
-            "title": pr_title,
+            "title": f"ADR-{adr_number}: Issue #{issue_number}",
             "body": (
                 f"## 🏗️ ADR Draft\n\n"
-                f"**[Zak](https://github.com/Sherwin-14/zak)** just drafted an Architectural Decision Record "
+                f"**[Zak](https://github.com/Sherwin-14/zak)** just drafted an Architecture Decision Record "
                 f"from the discussion in Issue #{issue_number}. Your decision is documented, structured, and ready for review.\n\n"
                 f"---\n\n"
                 f"### Before you merge\n"
@@ -108,21 +171,65 @@ def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) 
                 f"---\n\n"
                 f"*AI can make mistakes. You make the call.* 🚀"
             ),
-            "head": branch_name,
-            "base": default_branch,
+            "head": f"{owner}:{branch_name}",
+            "base": base_branch,
             "draft": True,
         },
     )
 
     logger.info(f"PR response status: {pr_response.status_code}")
-    logger.info(f"PR response body: {pr_response.text}")
-
-    if not pr_response.text:
-        raise ValueError(
-            f"Empty response from GitHub. Status code: {pr_response.status_code}"
-        )
 
     pr_data = pr_response.json()
     if "html_url" not in pr_data:
         raise ValueError(f"PR creation failed: {pr_data}")
     return pr_data["html_url"]
+
+
+def create_draft_pr(owner: str, repo: str, issue_number: int, adr_content: str) -> str:
+    """Orchestrate branch creation, file commit, and draft PR opening.
+
+    Args:
+        owner: The GitHub organization or user that owns the repository.
+        repo: The repository name.
+        issue_number: The issue number the ADR was generated from.
+        adr_content: The generated ADR document as a markdown string.
+
+    Returns:
+        str: The HTML URL of the created draft pull request.
+
+    Raises:
+        ValueError: If any step of the pipeline fails.
+    """
+    token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github+json",
+    }
+
+    repo_response = requests.get(
+        f"https://api.github.com/repos/{owner}/{repo}", headers=headers
+    )
+    repo_data = repo_response.json()
+    default_branch = repo_data["default_branch"]
+
+    base_owner, base_repo, base_branch = resolve_base_repo(
+        repo_data, owner, repo, default_branch
+    )
+
+    adr_number = get_next_adr_number(base_owner, base_repo, headers)
+
+    branch_name = push_adr_to_branch(
+        owner, repo, issue_number, adr_content, adr_number, headers
+    )
+
+    return open_draft_pr(
+        owner,
+        repo,
+        base_owner,
+        base_repo,
+        base_branch,
+        branch_name,
+        issue_number,
+        adr_number,
+        headers,
+    )

@@ -69,6 +69,11 @@ def extract_issue(data: dict, owner: str, repo: str, issue_number: int) -> dict:
         ValueError: If the API response is malformed, contains GraphQL errors,
             or if the owner, repository, or issue number cannot be resolved.
     """
+    if not isinstance(issue_number, int) or issue_number < 1:
+        raise ValueError(
+            f"Invalid issue number: {issue_number}. Must be a positive integer."
+        )
+
     if "data" not in data or data["data"] is None:
         raise ValueError(f"Unexpected API response: {data}")
     if "errors" in data:
@@ -125,16 +130,16 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
                 GITHUB_GRAPHQL_URL,
                 json={"query": build_query(owner, name, issue_number, cursor)},
                 headers=headers,
-                timeout=30
+                timeout=30,
             )
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.Timeout:
             raise TimeoutError("GitHub API request timed out")
-        except requests.exceptions.HTTPError as e:
-            raise ConnectionError(f"GitHub API HTTP error: {e}")
         except requests.exceptions.RequestException as e:
             raise ConnectionError(f"Failed to reach GitHub API: {e}")
+        except ValueError as e:
+            raise ValueError(f"Failed to parse GitHub API response: {e}")
 
         issue = extract_issue(data, owner, name, issue_number)
         comments = issue["comments"]
