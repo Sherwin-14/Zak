@@ -81,8 +81,8 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
     response = client.chat.completions.create(
         model="deepseek-v4-pro",
         messages=[
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "Hello"},
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": issue_thread},
         ],
         stream=False,
         reasoning_effort="high",

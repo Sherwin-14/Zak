@@ -42,5 +42,30 @@
       "Solution",
       "Consequences"
     ]
+  },
+  "tyree_akerman": {
+    "sections": [
+      "Issue",
+      "Decision",
+      "Status",
+      "Assumptions",
+      "Constraints",
+      "Positions",
+      "Argument",
+      "Implications",
+      "Related Decisions",
+      "Related Requirements",
+      "Related Artifacts",
+      "Notes"
+    ]
+  },
+  "y_statement": {
+    "sections": [
+      "Context",
+      "Concern",
+      "Decision",
+      "Quality Achieved",
+      "Tradeoff Accepted"
+    ]
   }
 }
