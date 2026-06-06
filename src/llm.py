@@ -75,25 +75,17 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
         openai.APIError: If the LLM API call fails.
     """
     client = OpenAI(
-        base_url="https://models.inference.ai.azure.com",
-        api_key=os.environ["GITHUB_PERSONAL_ACCESS_TOKEN"],
+        api_key=os.environ.get("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com"
     )
 
-    estimated_tokens = len(issue_thread) // 4
-    logger.info(f"Estimated input size: ~{estimated_tokens} tokens")
-    if estimated_tokens > 100000:
-        logger.warning(
-            f"Thread is ~{estimated_tokens} tokens and may exceed free tier limits. "
-            f"Consider upgrading your GitHub Models subscription to process long threads."
-        )
-
     response = client.chat.completions.create(
-        model=os.environ.get("LLM_MODEL", "gpt-4.1"),
+        model="deepseek-v4-pro",
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": issue_thread},
+            {"role": "system", "content": "You are a helpful assistant"},
+            {"role": "user", "content": "Hello"},
         ],
-        temperature=0,
-        max_tokens=2000,
+        stream=False,
+        reasoning_effort="high",
+        extra_body={"thinking": {"type": "enabled"}},
     )
     return response.choices[0].message.content
