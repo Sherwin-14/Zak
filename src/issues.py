@@ -110,7 +110,6 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
 
     Raises:
         EnvironmentError: If GITHUB_PERSONAL_ACCESS_TOKEN is not set.
-        TimeoutError: If the GitHub API request times out.
         ConnectionError: If the GitHub API returns an HTTP error or is
             unreachable.
         ValueError: If the API response is malformed or the issue cannot
