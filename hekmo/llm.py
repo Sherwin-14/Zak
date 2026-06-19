@@ -1,8 +1,10 @@
 import os
+import sys
 import logging
 import json
 from pathlib import Path
 from openai import OpenAI
+from hekmo import console
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,7 +20,7 @@ def load_templates() -> dict:
         FileNotFoundError: If templates.json does not exist at the expected path.
         json.JSONDecodeError: If templates.json is malformed.
     """
-    templates_path = Path(__file__).parent / "prompts" / "templates.json"
+    templates_path = Path(__file__).parent / "utils" / "templates.json"
     return json.loads(templates_path.read_text(encoding="utf-8"))
 
 
@@ -49,7 +51,7 @@ def build_system_prompt(adr_template: str = "default") -> str:
         )
     sections = templates[adr_template]["sections"]
     template_str = "\n".join(f"## {section}" for section in sections)
-    prompt_path = Path(__file__).parent / "prompts" / "system_prompt.md"
+    prompt_path = Path(__file__).parent / "utils" / "system_prompt.md"
     system_prompt = prompt_path.read_text(encoding="utf-8")
     return system_prompt.format(adr_template=f"# {{title}}\n\n{template_str}")
 
@@ -74,18 +76,26 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
         KeyError: If GITHUB_PERSONAL_ACCESS_TOKEN is not set in the environment.
         openai.APIError: If the LLM API call fails.
     """
-    client = OpenAI(
-        api_key=os.environ.get("DEEPSEEK_API_KEY"), base_url="https://api.deepseek.com"
-    )
+    api_key = os.environ.get("DEEPSEEK_API_KEY")
+    if not api_key:
+        console.print("bold red]✗[/bold red] DEEPSEEK API KEY is not set.")
+        sys.exit(1)
+    try:
+        client = OpenAI(
+            api_key=api_key, base_url="https://api.deepseek.com", timeout=15.0
+        )
+        response = client.chat.completions.create(
+            model="deepseek-v4-pro",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": issue_thread},
+            ],
+            stream=False,
+            reasoning_effort="high",
+            extra_body={"thinking": {"type": "enabled"}},
+        )
+        return response.choices[0].message.content
+    except Exception:
+        console.print("[red]Failed to generate ADR. Check your internet connection")
 
-    response = client.chat.completions.create(
-        model="deepseek-v4-pro",
-        messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": issue_thread},
-        ],
-        stream=False,
-        reasoning_effort="high",
-        extra_body={"thinking": {"type": "enabled"}},
-    )
-    return response.choices[0].message.content
+    sys.exit()

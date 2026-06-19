@@ -1,7 +1,9 @@
 import os
+import sys
 import requests
 import logging
 from dotenv import load_dotenv
+from hekmo import console
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -117,7 +119,8 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
     """
     token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
     if not token:
-        raise EnvironmentError("GITHUB_PERSONAL_ACCESS_TOKEN is not set")
+        console.print("[bold red]✗[/bold red] GITHUB_PERSONAL_ACCESS_TOKEN is not set")
+        sys.exit(1)
 
     headers = {"Authorization": f"Bearer {token}"}
     all_comments = []
@@ -134,13 +137,25 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
             response.raise_for_status()
             data = response.json()
         except requests.exceptions.Timeout:
-            raise TimeoutError("GitHub API request timed out")
-        except requests.exceptions.RequestException as e:
-            raise ConnectionError(f"Failed to reach GitHub API: {e}")
+            console.print("bold red]✗[/bold red] GitHub API request timed out")
+            sys.exit(1)
+        except requests.exceptions.RequestException:
+            console.print(
+                "[bold red]✗[/bold red] Could not reach GitHub. Check your internet connection."
+            )
+            sys.exit(1)
         except ValueError as e:
-            raise ValueError(f"Failed to parse GitHub API response: {e}")
+            console.print(
+                f"[bold red]✗[/bold red] Failed to parse GitHub API response: {e}"
+            )
+            sys.exit(1)
 
-        issue = extract_issue(data, owner, name, issue_number)
+        try:
+            issue = extract_issue(data, owner, name, issue_number)
+        except ValueError as e:
+            console.print(f"[bold red]✗[/bold red] {e}")
+            sys.exit(1)
+
         comments = issue["comments"]
         all_comments.extend(edge["node"] for edge in comments["edges"])
 

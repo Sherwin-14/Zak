@@ -1,7 +1,7 @@
 [project]
-name = "zak"
+name = "hekmo"
 version = "0.1.0"
-description = "Add your description here"
+description = "Fast ADR drafting that turns GitHub chaos into documented decisions"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -9,7 +9,6 @@ dependencies = [
     "openai>=2.32.0",
     "pyfiglet>=1.0.4",
     "python-dotenv>=1.2.2",
-    "questionary",
     "requests>=2.33.1",
     "rich>=15.0.0",
 ]
@@ -19,3 +18,13 @@ dev = [
     "pre-commit>=4.6.0",
     "ruff>=0.15.15",
 ]
+
+[project.scripts]
+hekmo = "hekmo.cli:cli"
+
+[tool.hatch.build.targets.wheel]
+packages = ["hekmo"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
