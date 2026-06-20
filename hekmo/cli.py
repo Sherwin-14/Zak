@@ -19,7 +19,7 @@ SUBTITLE = "Fast ADR drafting that turns GitHub chaos into documented decisions"
 
 def print_banner() -> None:
     """Print the CLI banner with ASCII art and subtitle."""
-    art = pyfiglet.figlet_format("Hekmo", font="univers")
+    art = pyfiglet.figlet_format("Hekmo", font="slant")
     console.print()
     console.print(Align.center(Text(art.rstrip(), style="bold cyan")))
     console.print()
@@ -33,7 +33,7 @@ def step(msg: str) -> None:
     Args:
         msg: The message to display.
     """
-    console.print(f"\n  [bold cyan]·[/bold cyan] [white]{msg}[/white]")
+    console.print(f"\n[bold cyan]·[/bold cyan] [white]{msg}[/white]")
 
 
 def ok(msg: str) -> None:
@@ -42,7 +42,7 @@ def ok(msg: str) -> None:
     Args:
         msg: The success message to display.
     """
-    console.print(f"  [bold green]✓[/bold green] {msg}")
+    console.print(f"[bold green]✓[/bold green] {msg}")
 
 
 def fail(msg: str) -> None:
@@ -51,7 +51,7 @@ def fail(msg: str) -> None:
     Args:
         msg: The failure message to display.
     """
-    console.print(f"  [bold red]✗[/bold red] {msg}")
+    console.print(f"[bold red]✗[/bold red] {msg}")
 
 
 def spinner(label: str, fn, *args, **kwargs):
@@ -90,8 +90,7 @@ def ask(label: str, hint: str = "", default: str = "") -> str:
         The user's input, or the default if input was empty.
     """
     console.print(
-        f"\n  [bold white]{label}[/bold white]"
-        + (f"  [dim]{hint}[/dim]" if hint else "")
+        f"\n [bold white]{label}[/bold white]" + (f"[dim]{hint}[/dim]" if hint else "")
     )
     val = click.prompt("  › ", default="", show_default=False, prompt_suffix="").strip()
     return val or default
@@ -117,7 +116,7 @@ def ask_int(label: str, hint: str = "") -> int:
         ).strip()
         if raw.isdigit():
             return int(raw)
-        console.print("  [red]Please enter a number.[/red]")
+        console.print("[red]Please enter a number.[/red]")
 
 
 def ask_template() -> str:
@@ -151,7 +150,7 @@ def ask_template() -> str:
             idx = int(val) - 1
             if 0 <= idx < len(items):
                 return items[idx][0]
-        console.print("  [red]Please enter a valid number.[/red]")
+        console.print("[red]Please enter a valid number.[/red]")
 
 
 @click.command()
@@ -163,19 +162,20 @@ def cli():
     repo = ask("Repository", "e.g. pandas")
     issue_no = ask_int("Issue Number", "e.g. 700")
     template = ask_template()
-    issue_data = spinner("fetching…", get_all_comments, owner, repo, issue_no)
+    issue_data = spinner("fetching ...", get_all_comments, owner, repo, issue_no)
+    console.print()
     ok(f"Got: {issue_data.get('title', '')!r}")
 
-    step("Generating ADR")
+    console.print()
     markdown = format_issue_as_markdown(issue_data)
     system_prompt = build_system_prompt(template)
-    adr = spinner("Scrumdiddlyumpting…", generate_adr, markdown, system_prompt)
+    adr = spinner("Scrumdiddlyumpting ... ", generate_adr, markdown, system_prompt)
     ok("ADR ready")
 
     filename = f"adr-{issue_no}.md"
     with open(filename, "w", encoding="utf-8") as f:
         f.write(adr)
 
-    console.print(f"\n  [green]✓ ADR written to {filename}[/green]")
-    console.print(f"  [dim]Location: {Path.cwd() / filename}[/dim]")
-    console.print("\n  [bold cyan]Done.[/bold cyan]\n")
+    console.print(
+        f"[green]✓ ADR written to [dim]Location: {Path.cwd() / filename}[/dim]"
+    )

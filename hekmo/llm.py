@@ -80,10 +80,9 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
     if not api_key:
         console.print("bold red]✗[/bold red] DEEPSEEK API KEY is not set.")
         sys.exit(1)
+
     try:
-        client = OpenAI(
-            api_key=api_key, base_url="https://api.deepseek.com", timeout=15.0
-        )
+        client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
         response = client.chat.completions.create(
             model="deepseek-v4-pro",
             messages=[
@@ -95,7 +94,8 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
             extra_body={"thinking": {"type": "enabled"}},
         )
         return response.choices[0].message.content
+
     except Exception:
-        console.print("[red]Failed to generate ADR. Check your internet connection")
+        console.print("[red]Failed to generate ADR.Check your internet connection")
 
     sys.exit()
