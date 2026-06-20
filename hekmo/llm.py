@@ -44,15 +44,11 @@ def build_system_prompt(adr_template: str = "default") -> str:
         FileNotFoundError: If system_prompt.md does not exist at the expected path.
     """
     templates = load_templates()
-    if adr_template not in templates:
-        raise ValueError(
-            f"Unknown template '{adr_template}'. "
-            f"Available: {list(templates.keys())}"
-        )
     sections = templates[adr_template]["sections"]
     template_str = "\n".join(f"## {section}" for section in sections)
     prompt_path = Path(__file__).parent / "utils" / "system_prompt.md"
     system_prompt = prompt_path.read_text(encoding="utf-8")
+
     return system_prompt.format(adr_template=f"# {{title}}\n\n{template_str}")
 
 
@@ -96,6 +92,6 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
         return response.choices[0].message.content
 
     except Exception:
-        console.print("[red]Failed to generate ADR.Check your internet connection")
+        console.print("[red]Failed to generate ADR. Check your internet connection")
 
     sys.exit()

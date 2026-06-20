@@ -68,7 +68,7 @@ def spinner(label: str, fn, *args, **kwargs):
     """
     with Progress(
         SpinnerColumn(style="cyan"),
-        TextColumn(f"  [dim]{label}[/dim]"),
+        TextColumn(f"[dim]{label}[/dim]"),
         transient=True,
         console=console,
     ) as p:
@@ -78,7 +78,7 @@ def spinner(label: str, fn, *args, **kwargs):
     return result
 
 
-def ask(label: str, hint: str = "", default: str = "") -> str:
+def ask(label: str, hint: str = "", default: str = "", required: bool = True) -> str:
     """Prompt the user for a text value.
 
     Args:
@@ -89,11 +89,18 @@ def ask(label: str, hint: str = "", default: str = "") -> str:
     Returns:
         The user's input, or the default if input was empty.
     """
-    console.print(
-        f"\n [bold white]{label}[/bold white]" + (f"[dim]{hint}[/dim]" if hint else "")
-    )
-    val = click.prompt("  › ", default="", show_default=False, prompt_suffix="").strip()
-    return val or default
+    while True:
+        console.print(
+            f"\n [bold white]{label}[/bold white]"
+            + (f"[dim]{hint}[/dim]" if hint else "")
+        )
+        val = click.prompt(
+            "  › ", default="", show_default=False, prompt_suffix=""
+        ).strip()
+        result = val or default
+        if result or not required:
+            return result
+        console.print("[red]This field is required.[/red]")
 
 
 def ask_int(label: str, hint: str = "") -> int:
@@ -108,8 +115,8 @@ def ask_int(label: str, hint: str = "") -> int:
     """
     while True:
         console.print(
-            f"\n  [bold white]{label}[/bold white]"
-            + (f"  [dim]{hint}[/dim]" if hint else "")
+            f"\n [bold white]{label}[/bold white]"
+            + (f"[dim]{hint}[/dim]" if hint else "")
         )
         raw = click.prompt(
             "  › ", default="", show_default=False, prompt_suffix=""
@@ -131,12 +138,12 @@ def ask_template() -> str:
     TEMPLATES_DATA = load_templates()
     items = list(TEMPLATES_DATA.items())
     console.print(
-        "\n  [bold white]Choose a template[/bold white] [dim](enter a number)[/dim]"
+        "\n [bold white]Choose a template[/bold white] [dim](enter a number)[/dim]"
     )
     rows = [items[i : i + 3] for i in range(0, len(items), 3)]
     for row in rows:
         line = "".join(
-            f"  [dim]{i+1+rows.index(row)*3}[/dim] {key:<18}"
+            f" [dim]{i+1+rows.index(row)*3}[/dim] {key:<18}"
             for i, (key, _) in enumerate(row)
         )
         console.print(line)
@@ -158,9 +165,9 @@ def cli():
     """zak — fast ADR drafting from GitHub issues and discussions."""
     print_banner()
 
-    owner = ask("GitHub org / owner", "e.g. pandas-dev")
-    repo = ask("Repository", "e.g. pandas")
-    issue_no = ask_int("Issue Number", "e.g. 700")
+    owner = ask("GitHub org / owner  ", "e.g. pandas-dev")
+    repo = ask("Repository  ", "e.g. pandas")
+    issue_no = ask_int("Issue Number  ", "e.g. 700")
     template = ask_template()
     issue_data = spinner("fetching ...", get_all_comments, owner, repo, issue_no)
     console.print()
@@ -176,6 +183,7 @@ def cli():
     with open(filename, "w", encoding="utf-8") as f:
         f.write(adr)
 
+    console.print()
     console.print(
         f"[green]✓ ADR written to [dim]Location: {Path.cwd() / filename}[/dim]"
     )
