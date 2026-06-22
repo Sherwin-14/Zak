@@ -100,7 +100,7 @@ def ask(label: str, hint: str = "", default: str = "", required: bool = True) ->
         result = val or default
         if result or not required:
             return result
-        console.print("[red]This field is required.[/red]")
+        console.print("\n [red]This field is required.[/red]")
 
 
 def ask_int(label: str, hint: str = "") -> int:
@@ -157,7 +157,7 @@ def ask_template() -> str:
             idx = int(val) - 1
             if 0 <= idx < len(items):
                 return items[idx][0]
-        console.print("[red]Please enter a valid number.[/red]")
+        console.print("\n [red]Please enter a valid number.[/red]")
 
 
 @click.command()
