@@ -43,7 +43,6 @@ class TestAskInt(unittest.TestCase):
     def test_retries_on_invalid_then_succeeds(self, mock_prompt):
         """ask_int() should keep prompting until valid digits are entered."""
         mock_prompt.side_effect = ["abc", "-1", "42"]
-        # Note: "-1".isdigit() is False in Python, so this is a valid retry case.
         result = cli.ask_int("Issue Number")
         self.assertEqual(result, 42)
         self.assertEqual(mock_prompt.call_count, 3)
