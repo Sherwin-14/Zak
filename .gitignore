@@ -2,5 +2,5 @@
 .ruff_cache
 .venv
 .python-version
-.__pycache__
+**/__pycache__/
 .adr-*
