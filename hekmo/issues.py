@@ -1,8 +1,10 @@
+import logging
 import os
 import sys
+
 import requests
-import logging
 from dotenv import load_dotenv
+
 from hekmo import console
 
 load_dotenv()
@@ -139,9 +141,9 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
         except requests.exceptions.Timeout:
             console.print("bold red]✗[/bold red] GitHub API request timed out")
             sys.exit(1)
-        except requests.exceptions.RequestException:
+        except requests.exceptions.RequestException as e:
             console.print(
-                "[bold red]✗[/bold red] Could not reach GitHub. Check your internet connection."
+                f"[bold red]✗ Unexpected error contacting GitHub:[/bold red] {e}"
             )
             sys.exit(1)
         except ValueError as e:
