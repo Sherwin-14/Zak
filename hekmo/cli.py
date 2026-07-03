@@ -1,14 +1,15 @@
-import click
 import logging
-import pyfiglet
-
-from rich.align import Align
-from rich.text import Text
-from rich.progress import Progress, SpinnerColumn, TextColumn
 from pathlib import Path
-from hekmo.issues import get_all_comments, format_issue_as_markdown
-from hekmo.llm import build_system_prompt, generate_adr, load_templates
+
+import click
+import pyfiglet
+from rich.align import Align
 from rich.console import Console
+from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.text import Text
+
+from hekmo.issues import format_issue_as_markdown, get_all_comments
+from hekmo.llm import build_system_prompt, generate_adr, load_templates
 
 logging.disable(logging.CRITICAL)
 
@@ -143,7 +144,7 @@ def ask_template() -> str:
     rows = [items[i : i + 3] for i in range(0, len(items), 3)]
     for row in rows:
         line = "".join(
-            f" [dim]{i+1+rows.index(row)*3}[/dim] {key:<18}"
+            f" [dim]{i + 1 + rows.index(row) * 3}[/dim] {key:<18}"
             for i, (key, _) in enumerate(row)
         )
         console.print(line)
@@ -162,7 +163,7 @@ def ask_template() -> str:
 
 @click.command()
 def cli():
-    """zak — fast ADR drafting from GitHub issues and discussions."""
+    """hekmo — fast ADR drafting from GitHub issues and discussions."""
     print_banner()
 
     owner = ask("GitHub org / owner  ", "e.g. pandas-dev")

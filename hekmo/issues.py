@@ -6,6 +6,10 @@ import requests
 from dotenv import load_dotenv
 
 from hekmo import console
+from hekmo.exceptions import (
+    GitHubError,
+    GitHubNotFoundError,
+)
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -74,22 +78,29 @@ def extract_issue(data: dict, owner: str, repo: str, issue_number: int) -> dict:
             or if the owner, repository, or issue number cannot be resolved.
     """
     if not isinstance(issue_number, int) or issue_number < 1:
-        raise ValueError(
-            f"Invalid issue number: {issue_number}. Must be a positive integer."
+        raise GitHubNotFoundError(
+            f"Invalid issue number: {issue_number}.",
+            "Must be a positive integer.",
         )
 
     if "data" not in data or data["data"] is None:
-        raise ValueError(f"Unexpected API response: {data}")
+        raise GitHubError("Unexpected API response from GitHub.")
     if "errors" in data:
         raise ValueError(f"GitHub API error: {data['errors'][0]['message']}")
 
     repository = data["data"]["repository"]
     if repository is None:
-        raise ValueError(f"Owner '{owner}' not found")
+        raise GitHubNotFoundError(
+            f"Owner '{owner}' not found.",
+            "Check the org/username spelling.",
+        )
 
     issue = repository["issue"]
     if issue is None:
-        raise ValueError(f"Issue #{issue_number} not found in {owner}/{repo}")
+        raise GitHubNotFoundError(
+            f"Issue #{issue_number} not found in {owner}/{repo}.",
+            "Check the repo name and issue number.",
+        )
 
     return issue
 
