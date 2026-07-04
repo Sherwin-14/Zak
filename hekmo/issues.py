@@ -3,15 +3,14 @@ import os
 import sys
 
 import requests
-from dotenv import load_dotenv
 
 from hekmo import console
 from hekmo.exceptions import (
     GitHubError,
     GitHubNotFoundError,
+    TokenMissingError,
 )
 
-load_dotenv()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -86,7 +85,7 @@ def extract_issue(data: dict, owner: str, repo: str, issue_number: int) -> dict:
     if "data" not in data or data["data"] is None:
         raise GitHubError("Unexpected API response from GitHub.")
     if "errors" in data:
-        raise ValueError(f"GitHub API error: {data['errors'][0]['message']}")
+        raise GitHubError(f"GitHub API error: {data['errors'][0]['message']}")
 
     repository = data["data"]["repository"]
     if repository is None:
@@ -132,8 +131,10 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
     """
     token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
     if not token:
-        console.print("[bold red]✗[/bold red] GITHUB_PERSONAL_ACCESS_TOKEN is not set")
-        sys.exit(1)
+        raise TokenMissingError(
+            "GITHUB_PERSONAL_ACCESS_TOKEN is not set.",
+            "Export it in your shell before running hekmo.",
+        )
 
     headers = {"Authorization": f"Bearer {token}"}
     all_comments = []
@@ -149,19 +150,12 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
             )
             response.raise_for_status()
             data = response.json()
-        except requests.exceptions.Timeout:
-            console.print("bold red]✗[/bold red] GitHub API request timed out")
-            sys.exit(1)
+        except requests.exceptions.Timeout as e:
+            raise GitHubError("GitHub API request timed out.") from e
         except requests.exceptions.RequestException as e:
-            console.print(
-                f"[bold red]✗ Unexpected error contacting GitHub:[/bold red] {e}"
-            )
-            sys.exit(1)
+            raise GitHubError("Unexpected error contacting GitHub.") from e
         except ValueError as e:
-            console.print(
-                f"[bold red]✗[/bold red] Failed to parse GitHub API response: {e}"
-            )
-            sys.exit(1)
+            raise GitHubError("Failed to parse GitHub's response.") from e
 
         try:
             issue = extract_issue(data, owner, name, issue_number)
