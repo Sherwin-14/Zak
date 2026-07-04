@@ -1,4 +1,4 @@
-<h1 align="center">Hekmo (ܚܶܟܡܬܐ / חָכְמָה / حكمة)</h1>
+<h1 align="center">Hekmo (ܚܟܡܬܐ / חָכְמָה / حكمة)</h1>
 <p align="center"><em>Syriac for "wisdom" (ḥekmtā) sharing its root with Hebrew (chokmah) and Arabic (hikma).</em></p>
 
 **Lightning fast ADR drafting for busy teams.**
@@ -48,11 +48,16 @@ hekmo
 
 ### Templates
 
-`Hekmo` supports multiple ADR formats out of the box, selectable at runtime:
+`hekmo` supports multiple ADR formats out of the box, selectable at runtime:
 
-- **Nygard** — the original, lightweight ADR format (Context / Decision / Status / Consequences)
-- **MADR** — Markdown Architecture Decision Records, a more structured format with explicit alternatives considered
-- *(see `Hekmo/utils/templates.json` for the full list and section definitions)*
+- **default** — a comprehensive general-purpose format (Status, Context, Considered Options, Decision, Rationale, Consequences, Open Questions, and more)
+- **Nygard** — the original, lightweight ADR format (Status, Context, Decision, Consequences)
+- **MADR** — Markdown Architecture Decision Records, with explicit decision drivers and pros/cons of considered options
+- **Alexandrian** — a narrative-style format (Prologue, Discussion, Solution, Consequences)
+- **Tyree-Akerman** — a detailed format capturing assumptions, constraints, positions, and related artifacts
+- **Y-Statement** — a compact, single-paragraph decision format (Context, Concern, Decision, Quality Achieved, Tradeoff Accepted)
+
+*(see `hekmo/utils/templates.json` for the full section breakdown of each format)*
 
 ----
 
@@ -126,7 +131,7 @@ If you're adopting this on a team. The highest-leverage improvement isn't tuning
 - This compounds: better threads mean less manual cleanup on *every* ADR, not just one.
 - Encourage contributors to write detailed, decision-oriented comments, and treat thread quality as part of the process, not an afterthought.
 
-**The ADR is only ever as good as the conversation that produced it**
+**The ADR is only ever as good as the conversation that produced it.**
 
 ----
 
