@@ -63,26 +63,8 @@ hekmo
 
 ### Example
 
-```bash
-$ Hekmo
+![Hekmo](hekmo.gif)
 
-  GitHub org / owner    e.g. pandas-dev
-  › nasa
-  
-  Repository             e.g. pandas
-  › earthaccess
-  
-  Issue Number           e.g. 700
-  › 42
-
-  Choose a template (enter a number)
-  1 nygard    2 madr    3 alexandrian
-  › 1
-
-  ✓ Got: 'Add request timeout to session calls'
-  ✓ ADR ready
-  ✓ ADR written to adr-42.md
-```
 ----
 
 ### Motivation
