@@ -38,20 +38,20 @@ class GitHubConnectionError(GitHubError):
     """Raised when GitHub is unreachable (DNS, connection refused, etc.)."""
 
 
-class DeepSeekError(HekmoError):
-    """Base exception for DeepSeek/LLM API failures."""
+class LLMError(HekmoError):
+    """Base exception for LLM API failures (currently DeepSeek; provider-agnostic)."""
 
 
-class DeepSeekAuthError(DeepSeekError):
-    """Raised on 401 — expired or invalid DeepSeek API key."""
+class LLMAuthError(LLMError):
+    """Raised on 401 — expired or invalid API key for the configured LLM provider."""
 
 
-class DeepSeekTimeoutError(DeepSeekError):
-    """Raised when the DeepSeek API request times out."""
+class LLMTimeoutError(LLMError):
+    """Raised when the LLM API request times out."""
 
 
-class DeepSeekConnectionError(DeepSeekError):
-    """Raised when DeepSeek is unreachable (DNS, connection refused, etc.)."""
+class LLMConnectionError(LLMError):
+    """Raised when the LLM provider is unreachable (DNS, connection refused, etc.)."""
 
 
 class TemplateError(HekmoError):

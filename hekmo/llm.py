@@ -1,10 +1,24 @@
-import os
-import sys
-import logging
 import json
+import logging
+import os
 from pathlib import Path
-from openai import OpenAI
-from hekmo import console
+
+from openai import (
+    APIConnectionError,
+    APITimeoutError,
+    AuthenticationError,
+    BadRequestError,
+    OpenAI,
+)
+
+from hekmo.exceptions import (
+    LLMAuthError,
+    LLMConnectionError,
+    LLMError,
+    LLMTimeoutError,
+    TemplateError,
+    TokenMissingError,
+)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -17,11 +31,17 @@ def load_templates() -> dict:
         dict: A dictionary mapping template names to their section definitions.
 
     Raises:
-        FileNotFoundError: If templates.json does not exist at the expected path.
-        json.JSONDecodeError: If templates.json is malformed.
+        TemplateError: If templates.json does not exist at the expected path
+        or is malformed.
     """
     templates_path = Path(__file__).parent / "utils" / "templates.json"
-    return json.loads(templates_path.read_text(encoding="utf-8"))
+    try:
+        return json.loads(templates_path.read_text(encoding="utf-8"))
+    except (FileNotFoundError, json.JSONDecodeError) as e:
+        raise TemplateError(
+            "templates.json is missing or corrupted.",
+            "This may indicate a broken installation, try reinstalling hekmo.",
+        ) from e
 
 
 def build_system_prompt(adr_template: str = "default") -> str:
@@ -40,14 +60,21 @@ def build_system_prompt(adr_template: str = "default") -> str:
             injected.
 
     Raises:
-        ValueError: If the specified template name is not found in templates.json.
-        FileNotFoundError: If system_prompt.md does not exist at the expected path.
+        TemplateError: If the template name is unknown, templates.json is
+            missing/corrupted, or system_prompt.md is missing.
     """
     templates = load_templates()
     sections = templates[adr_template]["sections"]
     template_str = "\n".join(f"## {section}" for section in sections)
+
     prompt_path = Path(__file__).parent / "utils" / "system_prompt.md"
-    system_prompt = prompt_path.read_text(encoding="utf-8")
+    try:
+        system_prompt = prompt_path.read_text(encoding="utf-8")
+    except FileNotFoundError as e:
+        raise TemplateError(
+            "system_prompt.md is missing.",
+            "This may indicate a broken installation — try reinstalling hekmo.",
+        ) from e
 
     return system_prompt.format(adr_template=f"# {{title}}\n\n{template_str}")
 
@@ -55,9 +82,8 @@ def build_system_prompt(adr_template: str = "default") -> str:
 def generate_adr(issue_thread: str, system_prompt: str) -> str:
     """Generate an ADR document from a GitHub issue thread using an LLM.
 
-    Sends the issue thread and system prompt to the configured LLM via the
-    GitHub Models inference endpoint. Logs a warning if the estimated token
-    count exceeds the free tier limit.
+    Sends the issue thread and system prompt to the configured LLM provider
+    (currently DeepSeek V4 Pro) for structured ADR extraction.
 
     Args:
         issue_thread: The full GitHub issue thread formatted as a markdown
@@ -69,13 +95,19 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
         str: The generated ADR document as a markdown string.
 
     Raises:
-        KeyError: If GITHUB_PERSONAL_ACCESS_TOKEN is not set in the environment.
-        openai.APIError: If the LLM API call fails.
+        TokenMissingError: If DEEPSEEK_API_KEY is not set in the environment.
+        LLMAuthError: If the API key is invalid or expired.
+        LLMTimeoutError: If the request times out.
+        LLMConnectionError: If the LLM provider is unreachable.
+        LLMError: If the request fails for any other reason (e.g. context
+            window exceeded, malformed response).
     """
     api_key = os.environ.get("DEEPSEEK_API_KEY")
     if not api_key:
-        console.print("bold red]✗[/bold red] DEEPSEEK API KEY is not set.")
-        sys.exit(1)
+        raise TokenMissingError(
+            "DEEPSEEK_API_KEY is not set.",
+            "Export it in your shell before running hekmo.",
+        )
 
     try:
         client = OpenAI(api_key=api_key, base_url="https://api.deepseek.com")
@@ -90,8 +122,21 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
             extra_body={"thinking": {"type": "enabled"}},
         )
         return response.choices[0].message.content
-
-    except Exception:
-        console.print("[red]Failed to generate ADR. Check your internet connection")
-
-    sys.exit()
+    except AuthenticationError as e:
+        raise LLMAuthError(
+            "DeepSeek API key expired or invalid.",
+            "Check your DEEPSEEK_API_KEY.",
+        ) from e
+    except APITimeoutError as e:
+        raise LLMTimeoutError("DeepSeek API request timed out.") from e
+    except APIConnectionError as e:
+        raise LLMConnectionError(
+            "Could not reach DeepSeek.", "Check your network connection."
+        ) from e
+    except BadRequestError as e:
+        raise LLMError(
+            "DeepSeek rejected the request.",
+            "The thread may be too long for the model's context window try a shorter thread.",
+        ) from e
+    except Exception as e:
+        raise LLMError(f"Failed to generate ADR: {e}") from e

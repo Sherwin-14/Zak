@@ -1,4 +1,5 @@
 import logging
+import sys
 from pathlib import Path
 
 import click
@@ -8,6 +9,7 @@ from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from rich.text import Text
 
+from hekmo.exceptions import HekmoError
 from hekmo.issues import format_issue_as_markdown, get_all_comments
 from hekmo.llm import build_system_prompt, generate_adr, load_templates
 
@@ -163,21 +165,38 @@ def ask_template() -> str:
 
 @click.command()
 def cli():
-    """hekmo — fast ADR drafting from GitHub issues and discussions."""
+    """hekmo — fast ADR drafting from GitHub issues."""
     print_banner()
 
     owner = ask("GitHub org / owner  ", "e.g. pandas-dev")
     repo = ask("Repository  ", "e.g. pandas")
     issue_no = ask_int("Issue Number  ", "e.g. 700")
-    template = ask_template()
-    issue_data = spinner("fetching ...", get_all_comments, owner, repo, issue_no)
-    console.print()
-    ok(f"Got: {issue_data.get('title', '')!r}")
 
-    console.print()
-    markdown = format_issue_as_markdown(issue_data)
-    system_prompt = build_system_prompt(template)
-    adr = spinner("Scrumdiddlyumpting ... ", generate_adr, markdown, system_prompt)
+    try:
+        template = ask_template()
+        issue_data = spinner("fetching ...", get_all_comments, owner, repo, issue_no)
+        console.print()
+        ok(f"Got: {issue_data.get('title', '')!r}")
+        console.print()
+        markdown = format_issue_as_markdown(issue_data)
+        system_prompt = build_system_prompt(template)
+        adr = spinner("Scrumdiddlyumpting ... ", generate_adr, markdown, system_prompt)
+
+    except HekmoError as e:
+        console.print()
+        fail(e.message)
+        if e.hint:
+            console.print(f"[dim]  {e.hint}[/dim]")
+        sys.exit(1)
+
+    # issue_data = spinner("fetching ...", get_all_comments, owner, repo, issue_no)
+    # console.print()
+    # ok(f"Got: {issue_data.get('title', '')!r}")
+
+    # console.print()
+    # markdown = format_issue_as_markdown(issue_data)
+    # system_prompt = build_system_prompt(template)
+    # adr = spinner("Scrumdiddlyumpting ... ", generate_adr, markdown, system_prompt)
     ok("ADR ready")
 
     filename = f"adr-{issue_no}.md"

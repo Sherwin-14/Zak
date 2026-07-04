@@ -2,7 +2,7 @@
   "default": {
     "sections": [
       "Status",
-      "Date", 
+      "Date",
       "Deciders",
       "Context",
       "Considered Options",
@@ -28,20 +28,10 @@
     ]
   },
   "nygard": {
-    "sections": [
-      "Status",
-      "Context",
-      "Decision",
-      "Consequences"
-    ]
+    "sections": ["Status", "Context", "Decision", "Consequences"]
   },
   "alexandrian": {
-    "sections": [
-      "Prologue",
-      "Discussion",
-      "Solution",
-      "Consequences"
-    ]
+    "sections": ["Prologue", "Discussion", "Solution", "Consequences"]
   },
   "tyree_akerman": {
     "sections": [

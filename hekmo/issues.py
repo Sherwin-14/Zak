@@ -1,10 +1,8 @@
 import logging
 import os
-import sys
 
 import requests
 
-from hekmo import console
 from hekmo.exceptions import (
     GitHubError,
     GitHubNotFoundError,
@@ -123,10 +121,10 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
               author login, body, and createdAt timestamp.
 
     Raises:
-        EnvironmentError: If GITHUB_PERSONAL_ACCESS_TOKEN is not set.
-        ConnectionError: If the GitHub API returns an HTTP error or is
+        TokenMissingError: If GITHUB_PERSONAL_ACCESS_TOKEN is not set.
+        GitHubError: If the GitHub API returns an HTTP error or is
             unreachable.
-        ValueError: If the API response is malformed or the issue cannot
+        GitHubNotFoundError: If the API response is malformed or the issue cannot
             be resolved.
     """
     token = os.environ.get("GITHUB_PERSONAL_ACCESS_TOKEN")
@@ -157,12 +155,7 @@ def get_all_comments(owner: str, name: str, issue_number: int) -> dict:
         except ValueError as e:
             raise GitHubError("Failed to parse GitHub's response.") from e
 
-        try:
-            issue = extract_issue(data, owner, name, issue_number)
-        except ValueError as e:
-            console.print(f"[bold red]✗[/bold red] {e}")
-            sys.exit(1)
-
+        issue = extract_issue(data, owner, name, issue_number)
         comments = issue["comments"]
         all_comments.extend(edge["node"] for edge in comments["edges"])
 
