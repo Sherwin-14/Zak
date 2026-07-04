@@ -1,7 +1,4 @@
-<h1 align="center">Hekmo
-(ܚܶܟܡܬܐ / חָכְمة / حكمة)
-</h1>
-
+<h1 align="center">Hekmo (ܚܶܟܡܬܐ / חָכְמָה / حكمة)</h1>
 <p align="center"><em>Syriac for "wisdom" (ḥekmtā) sharing its root with Hebrew (chokmah) and Arabic (hikma).</em></p>
 
 **Lightning fast ADR drafting for busy teams.**
