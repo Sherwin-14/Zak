@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 from pathlib import Path
 
@@ -20,9 +19,6 @@ from hekmo.exceptions import (
     TokenMissingError,
 )
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
 
 def load_templates() -> dict:
     """Load ADR templates from the templates.json configuration file.
@@ -40,7 +36,7 @@ def load_templates() -> dict:
     except (FileNotFoundError, json.JSONDecodeError) as e:
         raise TemplateError(
             "templates.json is missing or corrupted.",
-            "This may indicate a broken installation, try reinstalling hekmo.",
+            "This indicates a broken installation, try reinstalling hekmo.",
         ) from e
 
 
@@ -73,7 +69,7 @@ def build_system_prompt(adr_template: str = "default") -> str:
     except FileNotFoundError as e:
         raise TemplateError(
             "system_prompt.md is missing.",
-            "This may indicate a broken installation — try reinstalling hekmo.",
+            "This indicates a broken installation try reinstalling hekmo.",
         ) from e
 
     return system_prompt.format(adr_template=f"# {{title}}\n\n{template_str}")

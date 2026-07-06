@@ -105,7 +105,13 @@ flowchart LR
 
 #### Model support
 
-`hekmo` currently uses **DeepSeek V4 Pro** exclusively for ADR generation. Your `DEEPSEEK_API_KEY` must have access to this model other DeepSeek models and other providers are not yet supported. As with any LLM-backed tool, `hekmo` is subject to the context window limits of the underlying model.
+`hekmo` currently uses **DeepSeek V4 Pro** exclusively for ADR generation. Your `DEEPSEEK_API_KEY` must have access to this model other DeepSeek models and other providers are not yet supported. As with any LLM-backed tool, `hekmo` is subject to the context window limits of the underlying model currently.
+
+#### Where your ADR is saved
+
+`hekmo` saves the generated ADR as `adr-<issue_number>.md` in the directory you're currently in when you run the command. It does not clone or touch any local git repo it only talks to GitHub's API.
+
+If a file with that name already exists in your current directory, it will be silently overwritten. Run `hekmo` from a directory dedicated to your ADRs (or move the generated file immediately) if you want to avoid this.
 
 If you're adopting this on a team, highest-leverage improvement today is raising the quality of the input itself:
 
