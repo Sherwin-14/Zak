@@ -50,12 +50,12 @@ hekmo
 
 `hekmo` supports multiple ADR formats out of the box, selectable at runtime:
 
-- **default** — a comprehensive general-purpose format (Status, Context, Considered Options, Decision, Rationale, Consequences, Open Questions, and more)
-- **Nygard** — the original, lightweight ADR format (Status, Context, Decision, Consequences)
-- **MADR** — Markdown Architecture Decision Records, with explicit decision drivers and pros/cons of considered options
-- **Alexandrian** — a narrative-style format (Prologue, Discussion, Solution, Consequences)
+- **default** — a comprehensive general-purpose format.
+- **Nygard** — the original, lightweight ADR format.
+- **MADR** — Markdown Architecture Decision Records, with explicit decision drivers and pros/cons of considered options.
+- **Alexandrian** — a narrative-style format.
 - **Tyree-Akerman** — a detailed format capturing assumptions, constraints, positions, and related artifacts
-- **Y-Statement** — a compact, single-paragraph decision format (Context, Concern, Decision, Quality Achieved, Tradeoff Accepted)
+- **Y-Statement** — a compact, single-paragraph decision format.
 
 *(see `hekmo/utils/templates.json` for the full section breakdown of each format)*
 
@@ -75,7 +75,7 @@ This isn't just anecdotal. A 2023 mining-software-repositories study of ADR usag
 
 Separately, an exploratory study on LLM-generated ADRs ([Dhar et al.](https://arxiv.org/html/2403.01709v1), 2024) found that even the strongest models (GPT-4) can produce design decisions in the correct ADR format, but consistently fall short of comprehensively capturing the decision meaning LLMs are a genuinely useful drafting aid, not an autonomous replacement for human judgment. That study also worked from pre-cleaned, single-paragraph decision context, not the messier reality of a live 50-comment GitHub thread the harder, noisier input hekmo is actually built to handle.  Follow-up work by the same group ([Dhar et al.](https://arxiv.org/abs/2504.08207), 2025) addressed this gap with retrieval-augmented fine-tuning, and a more recent study ([Context Matters](https://arxiv.org/html/2604.03826v1), 2026) showed that providing a project's prior architectural decisions as context substantially improves generation quality.
 
-Taken together: the practice of writing ADRs is dying from friction, not from lack of value, and LLMs can meaningfully lower that friction but only as a first draft a human reviews, not a replacement for their judgment. hekmo is built around both of these findings: it exists to make drafting cheap enough that it actually happens, and its "traceability by design" system prompt (see Best Practices and Architecture) is a direct response to the second finding every sentence must trace back to the thread, specifically so the output is a reviewable draft rather than a plausible-sounding hallucination.
+***Conclusion***: the practice of writing ADRs is dying from friction, not from lack of value, and LLMs can meaningfully lower that friction but only as a first draft a human reviews, not a replacement for their judgment. hekmo is built around both of these findings: it exists to make drafting cheap enough that it actually happens, and its "traceability by design" system prompt (see Best Practices and Architecture) is a direct response to the second finding every sentence must trace back to the thread, specifically so the output is a reviewable draft rather than a plausible-sounding hallucination.
 
 ----
 
@@ -107,10 +107,10 @@ flowchart LR
 
 `hekmo` currently uses **DeepSeek V4 Pro** exclusively for ADR generation. Your `DEEPSEEK_API_KEY` must have access to this model other DeepSeek models and other providers are not yet supported. As with any LLM-backed tool, `hekmo` is subject to the context window limits of the underlying model.
 
-If you're adopting this on a team. The highest-leverage improvement isn't tuning prompts or switching models it's raising the quality of the input itself:
+If you're adopting this on a team, highest-leverage improvement today is raising the quality of the input itself:
 
 - Better threads produce more factually grounded ADRs with less hallucination.
-- This compounds: better threads mean less manual cleanup on *every* ADR, not just one.
+- Better threads mean less manual cleanup on *every* ADR, not just one.
 - Encourage contributors to write detailed, decision-oriented comments, and treat thread quality as part of the process, not an afterthought.
 
 **The ADR is only ever as good as the conversation that produced it.**
