@@ -189,19 +189,17 @@ def cli():
             console.print(f"[dim]  {e.hint}[/dim]")
         sys.exit(1)
 
-    # issue_data = spinner("fetching ...", get_all_comments, owner, repo, issue_no)
-    # console.print()
-    # ok(f"Got: {issue_data.get('title', '')!r}")
-
-    # console.print()
-    # markdown = format_issue_as_markdown(issue_data)
-    # system_prompt = build_system_prompt(template)
-    # adr = spinner("Scrumdiddlyumpting ... ", generate_adr, markdown, system_prompt)
     ok("ADR ready")
 
     filename = f"adr-{issue_no}.md"
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(adr)
+    try:
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(adr)
+    except OSError as e:
+        console.print()
+        fail(f"Could not write ADR to {filename}.")
+        console.print(f"[dim]  {e}[/dim]")
+        sys.exit(1)
 
     console.print()
     console.print(
