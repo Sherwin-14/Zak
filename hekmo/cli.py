@@ -17,7 +17,7 @@ logging.disable(logging.CRITICAL)
 
 console = Console(highlight=False)
 
-SUBTITLE = "Fast ADR drafting that turns GitHub chaos into documented decisions"
+SUBTITLE = "Lightning fast ADR drafting for busy teams"
 
 
 def print_banner() -> None:

@@ -1,17 +1,15 @@
 <h1 align="center">Hekmo (ܚܟܡܬܐ / חָכְמָה / حكمة)</h1>
 <p align="center"><em>Syriac for "wisdom" (ḥekmtā) sharing its root with Hebrew (chokmah) and Arabic (hikma).</em></p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/license-EPL--2.0-blue" alt="License">
-  <img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="Python">
-  <img src="https://img.shields.io/github/issues/owner/repo" alt="Open Issues">
-  <img src="https://img.shields.io/github/stars/owner/repo" alt="Stars">
-</p>
-
-
 **Lightning fast ADR drafting for busy teams.**
 
 This tool takes a GitHub issue thread with arguments, the back-and-forth, the eventual consensus and distills it into a clean Architecture Decision Record (ADR), so the reasoning behind a decision doesn't get lost in a comment thread nobody wants to re-read.
+
+----
+
+### Example
+
+![Hekmo](hekmo.gif)
 
 ----
 
@@ -41,11 +39,6 @@ Then run:
 ```bash
 hekmo
 ```
-----
-
-### Example
-
-![Hekmo](hekmo.gif)
 
 ----
 
@@ -72,19 +65,6 @@ hekmo
 - **Y-Statement** — a compact, single-paragraph decision format.
 
 *(see `hekmo/utils/templates.json` for the full section breakdown of each format)*
-
-
-----
-
-### Motivation
-
-Most engineering decisions don't happen in a design doc. They happen in a GitHub issue: someone proposes something, three people push back, someone finds a tradeoff nobody considered, and twenty comments later there's a decision buried in a thread that will never be read again.
-
-This isn't just anecdotal. A 2023 mining-software-repositories study of ADR usage across open-source GitHub projects ([Buchgeher et al., IEEE Access](https://ieeexplore.ieee.org/document/10155430)) found that ADR adoption remains low overall, and that roughly half of repositories that do adopt the practice contain only one to five ADRs total, a pattern the authors read as teams trying ADRs and then not sustaining them. The study also found that where ADRs do stick, it's a deliberate, sustained team effort over time, not a one-off habit.
-
-Separately, an exploratory study on LLM-generated ADRs ([Dhar et al.](https://arxiv.org/html/2403.01709v1), 2024) found that even the strongest models (GPT-4) can produce design decisions in the correct ADR format, but consistently fall short of comprehensively capturing the decision meaning LLMs are a genuinely useful drafting aid, not an autonomous replacement for human judgment. That study also worked from pre-cleaned, single-paragraph decision context, not the messier reality of a live 50-comment GitHub thread the harder, noisier input hekmo is actually built to handle.  Follow-up work by the same group ([Dhar et al.](https://arxiv.org/abs/2504.08207), 2025) addressed this gap with retrieval-augmented fine-tuning, and a more recent study ([Context Matters](https://arxiv.org/html/2604.03826v1), 2026) showed that providing a project's prior architectural decisions as context substantially improves generation quality.
-
-***Conclusion***: the practice of writing ADRs is dying from friction, not from lack of value, and LLMs can meaningfully lower that friction but only as a first draft a human reviews, not a replacement for their judgment. hekmo is built around both of these findings: it exists to make drafting cheap enough that it actually happens, and its "traceability by design" system prompt (see Best Practices and Architecture) is a direct response to the second finding every sentence must trace back to the thread, specifically so the output is a reviewable draft rather than a plausible-sounding hallucination.
 
 ----
 
@@ -129,6 +109,19 @@ If you're adopting this on a team, highest-leverage improvement today is raising
 - Encourage contributors to write detailed, decision-oriented comments, and treat thread quality as part of the process, not an afterthought.
 
 **The ADR is only ever as good as the conversation that produced it.**
+
+----
+
+### Motivation
+
+Most engineering decisions don't happen in a design doc. They happen in a GitHub issue: someone proposes something, three people push back, someone finds a tradeoff nobody considered, and twenty comments later there's a decision buried in a thread that will never be read again.
+
+This isn't just anecdotal. A 2023 mining-software-repositories study of ADR usage across open-source GitHub projects ([Buchgeher et al., IEEE Access](https://ieeexplore.ieee.org/document/10155430)) found that ADR adoption remains low overall, and that roughly half of repositories that do adopt the practice contain only one to five ADRs total, a pattern the authors read as teams trying ADRs and then not sustaining them. The study also found that where ADRs do stick, it's a deliberate, sustained team effort over time, not a one-off habit.
+
+Separately, an exploratory study on LLM-generated ADRs ([Dhar et al.](https://arxiv.org/html/2403.01709v1), 2024) found that even the strongest models (GPT-4) can produce design decisions in the correct ADR format, but consistently fall short of comprehensively capturing the decision meaning LLMs are a genuinely useful drafting aid, not an autonomous replacement for human judgment. That study also worked from pre-cleaned, single-paragraph decision context, not the messier reality of a live 50-comment GitHub thread the harder, noisier input hekmo is actually built to handle.  Follow-up work by the same group ([Dhar et al.](https://arxiv.org/abs/2504.08207), 2025) addressed this gap with retrieval-augmented fine-tuning, and a more recent study ([Context Matters](https://arxiv.org/html/2604.03826v1), 2026) showed that providing a project's prior architectural decisions as context substantially improves generation quality.
+
+***Conclusion***: the practice of writing ADRs is dying from friction, not from lack of value, and LLMs can meaningfully lower that friction but only as a first draft a human reviews, not a replacement for their judgment. hekmo is built around both of these findings: it exists to make drafting cheap enough that it actually happens, and its "traceability by design" system prompt (see Best Practices and Architecture) is a direct response to the second finding every sentence must trace back to the thread, specifically so the output is a reviewable draft rather than a plausible-sounding hallucination.
+
 
 ----
 
