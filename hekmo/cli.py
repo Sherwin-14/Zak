@@ -202,6 +202,4 @@ def cli():
         sys.exit(1)
 
     console.print()
-    console.print(
-        f"[green]✓ ADR written to [dim]Location: {Path.cwd() / filename}[/dim]"
-    )
+    console.print(f"[green]✓ ADR written to[/green] [dim]{Path.cwd() / filename}[/dim]")
