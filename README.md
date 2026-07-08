@@ -1,6 +1,14 @@
 <h1 align="center">Hekmo (ܚܟܡܬܐ / חָכְמָה / حكمة)</h1>
 <p align="center"><em>Syriac for "wisdom" (ḥekmtā) sharing its root with Hebrew (chokmah) and Arabic (hikma).</em></p>
 
+<p align="center">
+  <img src="https://img.shields.io/badge/license-EPL--2.0-blue" alt="License">
+  <img src="https://img.shields.io/badge/python-3.12%2B-blue" alt="Python">
+  <img src="https://img.shields.io/github/issues/owner/repo" alt="Open Issues">
+  <img src="https://img.shields.io/github/stars/owner/repo" alt="Stars">
+</p>
+
+
 **Lightning fast ADR drafting for busy teams.**
 
 This tool takes a GitHub issue thread with arguments, the back-and-forth, the eventual consensus and distills it into a clean Architecture Decision Record (ADR), so the reasoning behind a decision doesn't get lost in a comment thread nobody wants to re-read.
@@ -35,6 +43,12 @@ hekmo
 ```
 ----
 
+### Example
+
+![Hekmo](hekmo.gif)
+
+----
+
 ### Configuration
 
 `Hekmo` needs two credentials, set as environment variables:
@@ -59,11 +73,6 @@ hekmo
 
 *(see `hekmo/utils/templates.json` for the full section breakdown of each format)*
 
-----
-
-### Example
-
-![Hekmo](hekmo.gif)
 
 ----
 
