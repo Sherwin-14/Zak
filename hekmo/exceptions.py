@@ -22,20 +22,8 @@ class GitHubError(HekmoError):
     """Base exception for GitHub API failures."""
 
 
-class GitHubAuthError(GitHubError):
-    """Raised on 401 — expired or invalid GitHub token."""
-
-
 class GitHubNotFoundError(GitHubError):
     """Raised when the owner, repo, or issue cannot be resolved."""
-
-
-class GitHubTimeoutError(GitHubError):
-    """Raised when the GitHub API request times out."""
-
-
-class GitHubConnectionError(GitHubError):
-    """Raised when GitHub is unreachable (DNS, connection refused, etc.)."""
 
 
 class LLMError(HekmoError):
