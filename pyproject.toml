@@ -1,9 +1,23 @@
 [project]
 name = "hekmo"
 version = "0.1.0"
-description = "Fast ADR drafting that turns GitHub chaos into documented decisions"
+description = "Lightning fast ADR drafting for busy teams."
 readme = "README.md"
 requires-python = ">=3.12"
+license = "EPL-2.0"
+authors = [
+    { name = "Sherwin"}
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Eclipse Public License 2.0 (EPL-2.0)",
+    "Intended Audience :: Developers",
+    "Environment :: Console",
+    "Topic :: Software Development :: Documentation",
+]
+
 dependencies = [
     "click>=8.4.1",
     "openai>=2.32.0",
@@ -11,6 +25,7 @@ dependencies = [
     "requests>=2.33.1",
     "rich>=15.0.0",
 ]
+
 
 [dependency-groups]
 dev = [
