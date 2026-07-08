@@ -1,6 +1,4 @@
-import logging
 import os
-
 import requests
 
 from hekmo.exceptions import (
@@ -8,9 +6,6 @@ from hekmo.exceptions import (
     GitHubNotFoundError,
     TokenMissingError,
 )
-
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 GITHUB_GRAPHQL_URL = "https://api.github.com/graphql"
 
@@ -71,8 +66,10 @@ def extract_issue(data: dict, owner: str, repo: str, issue_number: int) -> dict:
         dict: The issue object containing title, body, and comments.
 
     Raises:
-        ValueError: If the API response is malformed, contains GraphQL errors,
-            or if the owner, repository, or issue number cannot be resolved.
+        GitHubNotFoundError: If the issue number is invalid, or if the owner,
+              repository, or issue cannot be resolved.
+        GitHubError: If the API response is malformed or contains GraphQL
+              errors.
     """
     if not isinstance(issue_number, int) or issue_number < 1:
         raise GitHubNotFoundError(
@@ -184,7 +181,7 @@ def format_issue_as_markdown(issue_data: dict) -> str:
     """
     lines = []
     lines.append(f"# {issue_data['title']}\n")
-    lines.append(f"{issue_data['body']}\n")
+    lines.append(f"{issue_data['body'] or ''}\n")
     lines.append("---\n")
 
     for comment in issue_data["comments"]:
