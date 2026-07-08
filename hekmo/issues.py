@@ -77,10 +77,11 @@ def extract_issue(data: dict, owner: str, repo: str, issue_number: int) -> dict:
             "Must be a positive integer.",
         )
 
-    if "data" not in data or data["data"] is None:
-        raise GitHubError("Unexpected API response from GitHub.")
     if "errors" in data:
         raise GitHubError(f"GitHub API error: {data['errors'][0]['message']}")
+
+    if "data" not in data or data["data"] is None:
+        raise GitHubError("Unexpected API response from GitHub.")
 
     repository = data["data"]["repository"]
     if repository is None:
