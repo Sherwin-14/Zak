@@ -72,7 +72,7 @@ def build_system_prompt(adr_template: str = "default") -> str:
             "This indicates a broken installation try reinstalling hekmo.",
         ) from e
 
-    return system_prompt.format(adr_template=f"# {{title}}\n\n{template_str}")
+    return system_prompt.replace("{adr_template}", f"# {{title}}\n\n{template_str}")
 
 
 def generate_adr(issue_thread: str, system_prompt: str) -> str:
@@ -117,7 +117,13 @@ def generate_adr(issue_thread: str, system_prompt: str) -> str:
             reasoning_effort="high",
             extra_body={"thinking": {"type": "enabled"}},
         )
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        if not content:
+            raise LLMError(
+                "DeepSeek returned an empty response.",
+                "Please Try again.",
+            )
+        return content
     except AuthenticationError as e:
         raise LLMAuthError(
             "DeepSeek API key expired or invalid.",
