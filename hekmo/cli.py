@@ -189,6 +189,12 @@ def cli():
             console.print(f"[dim]  {e.hint}[/dim]")
         sys.exit(1)
 
+    except Exception:
+        console.print()
+        fail("An unexpected error occurred.")
+        console.print("[dim] Please file an issue on GitHub.[/dim]")
+        sys.exit(1)
+
     ok("ADR ready")
 
     filename = f"adr-{issue_no}.md"
