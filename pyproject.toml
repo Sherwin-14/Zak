@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = "EPL-2.0"
 authors = [
-    { name = "Sherwin"}
+    { name = "Sherwin Varghese"}
 ]
 
 classifiers = [
