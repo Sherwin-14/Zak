@@ -46,10 +46,10 @@ hekmo
 
 `Hekmo` needs two credentials, set as environment variables:
 
-| Variable | Purpose | Where to get it |
-|---|---|---|
-| `GITHUB_PERSONAL_ACCESS_TOKEN` | Reads issue/comment data via the GitHub GraphQL API | [github.com/settings/tokens](https://github.com/settings/tokens) — needs `repo` read scope for private repos, no scope needed for public repos |
-| `DEEPSEEK_API_KEY` | Powers ADR generation | [platform.deepseek.com](https://platform.deepseek.com) |
+| Variable | Purpose 
+|---|---|
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | Reads issue/comment data via the GitHub GraphQL API
+| `DEEPSEEK_API_KEY` | Powers ADR generation 
 
 ----
 
