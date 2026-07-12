@@ -5,3 +5,5 @@
 **/__pycache__/
 .adr-*
 .testvenv
+__pycache__/
+*.pyc
