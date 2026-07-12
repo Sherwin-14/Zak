@@ -44,7 +44,7 @@ hekmo
 
 ### Configuration
 
-`Hekmo` needs two credentials, set as environment variables:
+`hekmo` needs two credentials, set as environment variables:
 
 | Variable | Purpose 
 |---|---|
