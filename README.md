@@ -53,10 +53,10 @@ hekmo
 
 `hekmo` needs two credentials, set as environment variables:
 
-| Variable | Purpose 
+| Variable | Purpose |
 |---|---|
-| `GITHUB_PERSONAL_ACCESS_TOKEN` | Reads issue/comment data via the GitHub GraphQL API
-| `DEEPSEEK_API_KEY` | Powers ADR generation 
+| `GITHUB_PERSONAL_ACCESS_TOKEN` | Reads issue/comment data via the GitHub GraphQL API. ([Get one here](https://github.com/settings/tokens)) |
+| `DEEPSEEK_API_KEY` | Powers ADR generation. ([Get one here](https://platform.deepseek.com/api_keys)) |
 
 ----
 
@@ -72,6 +72,18 @@ hekmo
 - **Y-Statement** — a compact, single-paragraph decision format.
 
 *(see `hekmo/utils/templates.json` for the full section breakdown of each format)*
+
+----
+
+### Fork Setup
+
+To add your own ADR templates or modify generation behavior, fork the repository and install it in editable mode:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/Hekmo.git
+cd Hekmo
+pip install -e .
+```
 
 ----
 
