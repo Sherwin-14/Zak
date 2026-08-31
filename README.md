@@ -135,7 +135,3 @@ Separately, an exploratory study on LLM-generated ADRs ([Dhar et al.](https://ar
 ### License
 
 Eclipse Public License - 2.0
-
-## Code of Conduct
-
-See [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md).
