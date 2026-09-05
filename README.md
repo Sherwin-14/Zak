@@ -5,7 +5,6 @@
   <a href="https://pypi.org/project/hekmo/"><img alt="PyPI version" src="https://img.shields.io/pypi/v/hekmo"></a>
   <a href="https://pypi.org/project/hekmo/"><img alt="Python versions" src="https://img.shields.io/pypi/pyversions/hekmo"></a>
   <a href="https://github.com/Sherwin-14/Hekmo/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/badge/license-EPL--2.0-blue"></a>
-  <a href="https://github.com/Sherwin-14/Hekmo/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/Sherwin-14/Hekmo/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
 **Lightning fast ADR drafting for busy teams.**
